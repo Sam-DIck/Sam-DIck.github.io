@@ -1,0 +1,29 @@
+:root {
+    --main-color: #3498db;
+    --background-color: #333;
+    --nav-background-color: #222; 
+    --font-family: Roboto, sans-serif;
+}
+
+body {
+    color: var(--main-color);
+    background-color: var(--background-color);
+    font-family: var(--font-family);
+    padding: 0;
+    margin: 0;
+}
+#NavBar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    height: 10%;
+    max-height: 300px;
+    min-height: 100px;
+    background-color: var(--nav-background-color);
+    background-image: url('https://source.unsplash.com/random');
+    background-size: cover;
+    background-position: center;
+    box-sizing: border-box;
+}

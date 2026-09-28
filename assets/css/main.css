@@ -2792,7 +2792,7 @@ input, select, textarea {
 				display: block;
 				height: 100%;
 				left: 0;
-				opacity: 0.85;
+				opacity: 0.45;
 				position: absolute;
 				width: 100%;
 				z-index: 2;
@@ -3518,9 +3518,9 @@ input, select, textarea {
 				}
 
 		#banner.major {
-			height: 75vh;
-			min-height: 30em;
-			max-height: 50em;
+			height: 45vh;
+			min-height: 20em;
+			max-height: 32em;
 		}
 
 			#banner.major.alt {

@@ -2,7 +2,7 @@
 
 Name: Sam Dick
 
-Email: samakdick@gmail.com
+Email: [samakdick@gmail.com](mailto:samakdick+hello@gmail.com)
 Website: https://portfolio.samdick.uk
 linkedIn: https://www.linkedin.com/in/sam-d-196815255/
 GitHub: https://github.com/Sam-DIck

@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>A-Level Computer Science NEA | Sam Dick</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="icon" href="images/icon/favicon.ico" sizes="any" />
+	<link rel="icon" type="image/png" href="images/icon/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="images/icon/favicon-16x16.png" sizes="16x16" />
+	<link rel="apple-touch-icon" href="images/icon/apple-touch-icon.png" />
+	<link rel="manifest" href="images/icon/site.webmanifest" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+	<div id="wrapper">
+		<header id="header"><a href="index.html" class="logo"><strong>Sam Dick</strong> <span>Systems Programmer</span></a><nav><a href="mailto:samakdick+hello@gmail.com" class="header-contact icon solid alt fa-envelope"><span class="contact-label">samakdick@gmail.com</span><span class="label">Email</span></a><a href="https://github.com/Sam-DIck" class="header-contact icon brands alt fa-github"><span class="contact-label">Sam-DIck</span><span class="label">GitHub</span></a><a href="https://www.linkedin.com/in/sam-d-196815255/" class="header-contact icon brands alt fa-linkedin-in"><span class="contact-label">LinkedIn</span><span class="label">LinkedIn</span></a><a href="https://geos-games.itch.io/" class="header-contact itch-placeholder"><span class="contact-label">itch.io</span></a><a href="#menu">Menu</a></nav></header>
+		<nav id="menu"><ul class="links"><li><a href="index.html">Projects</a></li><li><a href="experiments.html">Experiments</a></li><li><a href="mailto:samakdick+hello@gmail.com">Email</a></li></ul></nav>
+		<div id="main" class="alt"><section id="one"><div class="inner">
+			<header class="major"><h1>A-Level Computer Science NEA Project</h1></header>
+			<p class="lead">As part of my A-Level Computer Science coursework, I created a basic game boat fishing game. The game allows players to control a boat, navigate a lake, and catch fish.</p>
+			<p>During this project, I focused on realistic physics simulation for the boat's buoyancy and the behavior of fish within the lake environment.</p>
+			<h2>Key Features</h2>
+			<ul>
+				<li>Fish schooling behavior using GPU compute shaders</li>
+				<li>Realistic boat buoyancy simulation</li>
+				<li>Procedurally generated lake terrain</li>
+			</ul>
+			<h2>Technologies</h2>
+			<ul>
+				<li>Unity 3D</li>
+				<li>Languages: C#, HLSL</li>
+				<li>GPU Compute Shaders</li>
+				<li>k-tree spatial partitioning</li>
+			</ul>
+
+			<h2>10,000 Fish in real-time</h2>
+			<p>I developed a real-time fish schooling simulation based on an adapted version of Craig Reynolds' <strong>Boids</strong> algorithm.</p>
+			<p>The project focused primarily on scalability: starting with a straightforward CPU implementation, I progressively redesigned the system to support increasingly large schools by addressing the main computational bottlenecks.</p>
+			<p>The final GPU-based implementation was capable of simulating approximately <strong>10,000–15,000 fish</strong> in real time.</p>
+
+			<h3>The Initial Implementation</h3>
+			<p>The first implementation ran entirely on the CPU.</p>
+			<p>Each fish evaluated its relationship with every other fish to determine the local forces required for schooling behaviour, such as:</p>
+			<ul>
+				<li><strong>Separation</strong> — avoiding nearby fish</li>
+				<li><strong>Alignment</strong> — matching the velocity of neighbours</li>
+				<li><strong>Cohesion</strong> — moving towards the local group</li>
+			</ul>
+			<p>This resulted in an <em>O(n<sup>2</sup>)</em> algorithm: every fish potentially needed to inspect every other fish.</p>
+			<p>While straightforward to implement, the approach scaled poorly. In practice, I found that approximately <strong>10–15 fish</strong> could be simulated before the computational cost became noticeable.</p>
+			<p>This made the primary optimisation target clear: <strong>neighbour searching</strong>.</p>
+
+			<h3>Spatial Partitioning</h3>
+			<p>The second implementation introduced a spatial partitioning structure based on a <strong>k-d tree</strong>.</p>
+			<p>Instead of every fish checking every other fish, the environment was divided spatially. A fish only needed to search its own region and relevant neighbouring regions when looking for nearby fish.</p>
+			<p>This significantly reduced the amount of unnecessary distance checking and allowed the simulation to scale to approximately <strong>500 fish</strong> while maintaining acceptable performance.</p>
+			<p>This iteration demonstrated an important principle of optimisation: rather than optimising the individual distance calculation, I changed the algorithm so that most distance calculations no longer needed to happen at all.</p>
+
+			<h3>Moving the Simulation to the GPU</h3>
+			<p>The next bottleneck was the sheer number of independent calculations being performed for each fish.</p>
+			<p>Because the schooling calculations are highly parallel, I moved the simulation to the GPU using <strong>compute shaders</strong>.</p>
+			<p>I initially investigated combining the GPU implementation with the spatial partitioning approach, but implementing a suitable GPU-based k-d tree proved more complex than anticipated. Instead, I returned to the simpler neighbour-search algorithm and focused on exploiting the GPU's parallelism.</p>
+			<p>The final implementation used a <strong>two-pass compute pipeline</strong>.</p>
+			<h4>Pass 1 — Calculate Acceleration</h4>
+			<p>The first compute pass read each fish's position and velocity and calculated its resulting acceleration from the schooling rules.</p>
+			<p>The acceleration for each fish was written into a separate buffer.</p>
+			<p>Keeping this calculation separate from the integration step avoided race conditions caused by one fish reading data that another fish was simultaneously modifying.</p>
+			<h4>Pass 2 — Integrate Motion</h4>
+			<p>The second pass applied the calculated accelerations to update each fish's velocity and position.</p>
+			<p>Conceptually:</p>
+			<p><strong>a<sub>i</sub> = f(neighbours<sub>i</sub>)</strong></p>
+			<p><strong>v<sub>i</sub> &larr; v<sub>i</sub> + a<sub>i</sub> &Delta;t</strong></p>
+			<p><strong>p<sub>i</sub> &larr; p<sub>i</sub> + v<sub>i</sub> &Delta;t</strong></p>
+			<p>Separating these operations into two passes ensured that every fish was working from a consistent snapshot of the previous simulation state.</p>
+
+			<h3>Results</h3>
+			<p>The three implementations provided a useful progression in scalability:</p>
+			<div class="table-wrapper"><table>
+				<thead><tr><th>Implementation</th><th>Approach</th><th>Approx. Scale</th></tr></thead>
+				<tbody>
+					<tr><td>CPU</td><td>Naive all-to-all search</td><td>10–15 fish</td></tr>
+					<tr><td>CPU</td><td>Spatial partitioning / k-d tree</td><td>~500 fish</td></tr>
+					<tr><td>GPU</td><td>Compute shader, parallelised neighbour search</td><td>~10,000–15,000 fish</td></tr>
+				</tbody>
+			</table></div>
+			<p>The final system could therefore simulate <strong>orders of magnitude more fish</strong> than the original implementation.</p>
+			<p>The project also gave me practical experience with a common GPU-compute constraint: moving a calculation to the GPU is not automatically enough. Data movement between CPU and GPU can itself become the bottleneck.</p>
+
+			<h3>GPU ↔ CPU Data Transfer</h3>
+			<p>One of the limitations of the final implementation was the boundary between the simulation and rendering systems.</p>
+			<p>Fish positions, velocities, and accelerations were copied out of GPU buffers and processed on the CPU to construct the <strong>TRS matrices</strong> required for indirect instanced rendering.</p>
+			<p>This introduced CPU/GPU synchronisation and data-transfer overhead.</p>
+			<p>At sufficiently large fish counts, the cost of transferring and preparing this data became a significant portion of the total workload.</p>
+			<p>A more advanced implementation would keep the entire pipeline GPU-resident:</p>
+			<p><strong>Simulation &rarr; Transforms &rarr; Indirect Rendering</strong></p>
+			<p>without requiring the CPU to retrieve the simulation state each frame.</p>
+			<p>At the time, I had not yet encountered this fully GPU-resident approach; discovering it later highlighted that the optimization problem extended beyond the compute shader itself and into the architecture of the rendering pipeline.</p>
+
+			<h3>Limitations</h3>
+			<h4>Neighbour Search</h4>
+			<p>Although the GPU implementation parallelised the workload, each fish still performed an <em>O(n)</em> neighbour search.</p>
+			<p>This meant that increasing the school size eventually caused the neighbour-search cost to dominate again.</p>
+			<p>A GPU-friendly spatial acceleration structure, such as a uniform grid or GPU-built spatial hash, would allow the search to scale more effectively.</p>
+			<h4>CPU/GPU Synchronisation</h4>
+			<p>The simulation state was transferred back to the CPU to generate rendering transforms.</p>
+			<p>This introduced unnecessary synchronisation and data movement. Keeping the simulation and rendering data entirely on the GPU would remove this bottleneck.</p>
+			<h4>No Environmental Awareness</h4>
+			<p>The fish only considered other fish when determining their movement.</p>
+			<p>They had no awareness of:</p>
+			<ul>
+				<li>Terrain</li>
+				<li>The lake bed</li>
+				<li>Obstacles</li>
+				<li>The water surface</li>
+				<li>Other environmental geometry</li>
+			</ul>
+			<p>As a result, fish could swim through objects, intersect the terrain, or leave the water entirely.</p>
+			<p>A more complete implementation could incorporate environment-aware steering, collision avoidance, or a GPU-friendly representation of the surrounding volume.</p>
+
+			<h3>Outcome</h3>
+			<p>The project evolved from a simple CPU implementation into a GPU-accelerated simulation capable of handling <strong>thousands of independently simulated agents</strong>.</p>
+			<p>The most valuable part of the project was the optimisation process itself: profiling the initial implementation, identifying neighbour searching as the dominant cost, experimenting with spatial partitioning, and eventually restructuring the simulation around massively parallel GPU computation.</p>
+			<p>It also exposed an important distinction between <strong>GPU computation</strong> and a genuinely <strong>GPU-native pipeline</strong>. Although the final simulation performed its calculations on the GPU, CPU/GPU data transfers remained a significant bottleneck, providing a clear direction for further optimisation.</p>
+
+			<h2>Making Things Float</h2>
+			<p>I developed a mesh-based buoyancy system capable of applying buoyant forces to arbitrary 3D objects, including concave meshes and objects that are only partially submerged.</p>
+			<p>The goal was not to produce a physically perfect fluid simulation, but a stable and convincing approximation that could respond naturally to changing conditions. The resulting system allowed objects to float, tilt under changing loads, and respond to external forces such as wind, motors, and player movement.</p>
+
+			<h3>From Arbitrary Meshes to Volume</h3>
+			<p>The first problem was calculating the volume of an arbitrary mesh.</p>
+			<p>Since a mesh is composed of triangles, I decomposed each triangle into a tetrahedron using a common reference point. I experimented with several choices for this point, including the average of all vertices and the centre of the bounding box. The resulting volume differences were relatively small for the meshes I was targeting, so I chose the bounding-box centre for its simplicity and low computational cost.</p>
+			<p>For a tetrahedron defined by the reference point <em>M</em> and triangle vertices <em>v<sub>1</sub>, v<sub>2</sub>, v<sub>3</sub></em>, its signed volume can be calculated using the scalar triple product:</p>
+			<p><strong>V = (1/6) (M − v<sub>1</sub>) &middot; ((v<sub>2</sub> − v<sub>1</sub>) &times; (v<sub>3</sub> − v<sub>1</sub>))</strong></p>
+			<p>The important detail here is that the volume is <strong>signed</strong> rather than taking its absolute value.</p>
+			<p>This turned out to be useful rather than problematic. Correctly wound triangles contribute positive volume while oppositely oriented geometry contributes negative volume. As a result, overlapping or intentionally reversed regions of a mesh could effectively cancel out, allowing the same approach to handle more complex and concave geometry without requiring the mesh to be explicitly converted into a collection of convex pieces.</p>
+
+			<h3>From Volume to Buoyancy</h3>
+			<p>Once the volume of each tetrahedron could be determined, Archimedes' principle provided the basis for calculating buoyancy:</p>
+			<p><strong>F<sub>b</sub> = &rho; V g</strong></p>
+			<p>where:</p>
+			<ul>
+				<li>F<sub>b</sub> is the buoyant force</li>
+				<li>&rho; is the density of the fluid</li>
+				<li>V is the submerged volume</li>
+				<li>g is gravitational acceleration</li>
+			</ul>
+			<p>Rather than applying a single force to the object's centre of mass, I calculated the contribution of each tetrahedron independently and applied the resulting force at that tetrahedron's centre.</p>
+			<p>This distributed approach was important. It meant that buoyancy naturally generated <strong>torque</strong> as the object rotated or as its mass distribution changed, rather than simply pushing the object upwards.</p>
+
+			<h3>Handling Partial Submersion</h3>
+			<p>The next problem was that the full tetrahedron volume should only contribute while submerged.</p>
+			<p>For each tetrahedron, I first checked whether it was completely above the water surface. If so, it could be discarded immediately.</p>
+			<p>For tetrahedra intersecting the water surface, I projected the relevant vertices onto the water surface and used the resulting geometry to approximate the submerged volume.</p>
+			<p>This was deliberately an approximation rather than a true geometric clipping operation. At the time, accurately clipping every tetrahedron against a dynamically displaced wave surface was outside the scope of the project.</p>
+			<p>The approximation was generally convincing, but became less reliable with particularly unusual geometry or aggressive wave shapes.</p>
+
+			<h3>Applying Forces</h3>
+			<p>The calculated buoyant force was applied through Unity's physics system at the centre of each tetrahedron.</p>
+			<p>This produced an emergent behaviour that was more interesting than simply making an object float:</p>
+			<ul>
+				<li>Objects naturally tilted as their submerged volume changed.</li>
+				<li>Moving mass affected the object's orientation.</li>
+				<li>External forces could interact with buoyancy rather than being overridden by it.</li>
+				<li>Concave or negatively oriented regions could contribute opposing forces.</li>
+				<li>Multiple points of force application produced realistic-looking rotational behaviour.</li>
+			</ul>
+			<p>This made it possible for a player character to walk around on a floating object and visibly affect its attitude as their weight moved around the surface.</p>
+			<p>The same system could also respond to forces such as wind or propulsion from a motor.</p>
+
+			<h3>Limitations</h3>
+			<p>The system deliberately traded physical accuracy for computational simplicity.</p>
+			<h4>Approximate water clipping</h4>
+			<p>The submerged geometry was approximated by projecting vertices rather than explicitly clipping each tetrahedron against the water surface. This worked well for typical geometry, but could produce inaccurate volumes when a tetrahedron intersected a strongly curved or rapidly changing wave.</p>
+			<h4>Mesh resolution</h4>
+			<p>Because the calculation was based on the mesh's existing triangles, low-poly geometry could produce poor approximations of the actual submerged volume. For example, a tetrahedron could span a wave crest and trough while having all of its vertices on opposite sides of the surface. The system therefore inherited some of the limitations of the input mesh.</p>
+			<h4>Vertex winding</h4>
+			<p>The signed-volume calculation assumes consistent triangle winding. Incorrectly wound geometry can therefore produce incorrect or opposing volume contributions.</p>
+			<h4>Physical approximation</h4>
+			<p>The system was designed to produce stable, believable behaviour rather than solve the full fluid-dynamics problem. Effects such as water displacement, drag, turbulence, and wave interaction were simplified or omitted.</p>
+
+			<h3>Outcome</h3>
+			<p>Despite these limitations, the system produced stable and convincing buoyancy across arbitrary mesh geometry.</p>
+			<p>More importantly, the distributed-force approach made the simulation responsive to the rest of the physics system. Objects did not simply move vertically in response to buoyancy; they reacted to where forces were being applied and how their mass was distributed.</p>
+
+			<ul class="actions"><li><a href="https://github.com/Sam-DIck/Boids" class="button primary">View repository</a></li><li><a href="index.html" class="button">Back to projects</a></li></ul>
+		</div></section></div>
+		<footer id="footer"><div class="inner"><ul class="icons"><li><a href="https://github.com/Sam-DIck" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li><li><a href="https://www.linkedin.com/in/sam-d-196815255/" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li></ul><ul class="copyright"><li>&copy; Sam Dick</li></ul></div></footer>
+	</div>
+	<script src="assets/js/jquery.min.js"></script><script src="assets/js/jquery.scrolly.min.js"></script><script src="assets/js/jquery.scrollex.min.js"></script><script src="assets/js/browser.min.js"></script><script src="assets/js/breakpoints.min.js"></script><script src="assets/js/util.js"></script><script src="assets/js/main.js"></script>
+</body>
+</html>

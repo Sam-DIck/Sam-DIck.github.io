@@ -40,6 +40,23 @@
 		}
 	}
 
+	#skip-link {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		z-index: 10000;
+		padding: 0.75rem 1rem;
+		background: #ffffff;
+		color: #242943;
+		transform: translateY(-200%);
+
+		&:focus {
+			transform: translateY(0);
+			outline: 2px solid #242943;
+			outline-offset: 2px;
+		}
+	}
+
 // Base.
 
 	@import 'base/reset';

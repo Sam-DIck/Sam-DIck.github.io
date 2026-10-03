@@ -1,6 +1,23 @@
 @import url(fontawesome-all.min.css);
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,600,600italic");
 
+#skip-link {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	z-index: 10000;
+	padding: 0.75rem 1rem;
+	background: #ffffff;
+	color: #242943;
+	transform: translateY(-200%);
+}
+
+#skip-link:focus {
+	transform: translateY(0);
+	outline: 2px solid #242943;
+	outline-offset: 2px;
+}
+
 /*
 	Forty by HTML5 UP
 	html5up.net | @ajlkn

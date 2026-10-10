@@ -134,7 +134,9 @@
 				if ($link.length > 0) {
 					var href = $link.attr('href');
 
-					$link.on('click', function(event) {
+					$this.css('cursor', 'pointer');
+
+					$this.on('click', function(event) {
 						event.preventDefault();
 						event.stopPropagation();
 

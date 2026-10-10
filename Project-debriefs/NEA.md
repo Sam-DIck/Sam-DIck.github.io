@@ -2,8 +2,6 @@
 ## Overview
 As part of my A-Level Computer Science coursework, I created a basic game boat fishing game. The game allows players to control a boat, navigate a lake, and catch fish.
 
-During this project, I focused on realistic physics simulation for the boat's buoyancy and the behavior of fish within the lake environment.
-
 ## Key Features
 - Fish schooling behavior using GPU compute shaders
 - Realistic boat buoyancy simulation

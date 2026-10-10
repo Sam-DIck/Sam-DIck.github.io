@@ -4004,3 +4004,51 @@ input, select, textarea {
 			opacity: 1;
 			visibility: visible;
 		}
+/* Project badges */
+.badges {
+display: flex;
+flex-wrap: wrap;
+gap: 0.4em;
+list-style: none;
+margin: 0.75em 0 1em 0;
+padding: 0;
+}
+
+.badges li {
+margin: 0;
+padding: 0;
+}
+
+.badge {
+border-radius: 0.25em;
+border: solid 1px rgba(255, 255, 255, 0.5);
+color: #ffffff;
+display: inline-block;
+font-size: 0.65em;
+font-weight: 600;
+letter-spacing: 0.1em;
+line-height: 1;
+padding: 0.5em 0.75em;
+text-transform: uppercase;
+white-space: nowrap;
+}
+
+.badge.academic {
+background-color: #5a67d8;
+border-color: #5a67d8;
+}
+
+.badge.extracurricular {
+background-color: #d9822b;
+border-color: #d9822b;
+}
+
+.badge.skill {
+background-color: rgba(255, 255, 255, 0.12);
+}
+
+.tiles article .badges {
+margin-bottom: 0;
+position: relative;
+z-index: 3;
+}

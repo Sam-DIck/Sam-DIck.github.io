@@ -95,7 +95,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/MinuteMobster/Gameplay.gif" alt="" />
+						<img src="images/MinuteMobster/Dash.jpeg" data-gif="images/MinuteMobster/Gameplay.gif" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/minute-mobster.html" class="link">Minute Mobster</a></h3>
@@ -115,7 +115,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/SlopShop/Banner.png" alt="" />
+						<img src="images/SlopShop/Banner.png" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/slop-shop.html" class="link">Slop Shop</a></h3>
@@ -125,7 +125,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/SRobo/Robot.png" alt="" />
+						<img src="images/SRobo/Robot.png" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/robotics.html" class="link">Student Robotics</a></h3>
@@ -135,7 +135,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/APuzzlingTime/Gameplay.gif" alt="" />
+						<img src="images/APuzzlingTime/Thumbnail.jpg" data-gif="images/APuzzlingTime/Gameplay.gif" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/a-puzzling-time.html" class="link">A Puzzling Time</a></h3>
@@ -145,7 +145,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/WolfInSheepClothing/Sheep.png" alt="" />
+						<img src="images/WolfInSheepClothing/Sheep.png" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/wolf-in-sheep-clothing.html" class="link">Wolf in Sheep Clothing</a></h3>
@@ -155,7 +155,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/TilesInProgress/Thumbnail.png" alt="" />
+						<img src="images/TilesInProgress/Thumbnail.png" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/tiles-in-progress.html" class="link">Tiles in Progress</a></h3>
@@ -165,7 +165,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/DiceInABox/Level%201.png" alt="" />
+						<img src="images/DiceInABox/Level%201.png" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="projects/dice-in-a-box.html" class="link">Dice in a Box</a></h3>
@@ -175,7 +175,7 @@
 				</article>
 				<article>
 					<span class="image">
-						<img src="images/pic06.jpg" alt="" />
+						<img src="images/pic06.jpg" alt="" loading="lazy" />
 					</span>
 					<header class="major">
 						<h3><a href="experiments.html" class="link">Experiments</a></h3>
@@ -227,6 +227,20 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+	<script>
+		// Swap in the heavy GIFs only after the page has finished loading.
+		window.addEventListener('load', function () {
+			document.querySelectorAll('img[data-gif]').forEach(function (img) {
+				var gif = new Image();
+				gif.onload = function () {
+					img.src = gif.src;
+					// main.js copies the img src into the tile's background-image at init.
+					img.closest('article').style.backgroundImage = 'url(' + gif.src + ')';
+				};
+				gif.src = img.dataset.gif;
+			});
+		});
+	</script>
 
 </body>
 
